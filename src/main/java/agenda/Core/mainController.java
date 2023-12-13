@@ -3,7 +3,6 @@ package agenda.Core;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.TableColumn;
 
@@ -11,11 +10,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class mainController  implements Initializable {
-
     @FXML
     public VBox vbFormMain;
 
-    //TabPrincipal
+    //TabsPrincipal
     @FXML
     public TabPane tabPrincipal;
     @FXML
@@ -26,28 +24,74 @@ public class mainController  implements Initializable {
     public Tab tabAtualizarContato;
     @FXML
     public Tab tabExcluirContato;
-    @FXML
-    public AnchorPane achCadastro;
-    @FXML
-    public AnchorPane achSelecionar;
-    @FXML
-    public AnchorPane achAtualizar;
-    @FXML
-    public AnchorPane achExcluir;
 
-    //Split da tela de Visualização do contato
+
+    // Cadastrar Contato
     @FXML
-    public SplitPane sptDadosContatos;
+    public TextField edtNomeCompletoCadastro;
     @FXML
-    public AnchorPane achDadosPrincipais;
+    public TextField edtDataDeNascimentoCadastro;
+    @FXML
+    public TextField edtNumeroDeTelefoneCadastro;
+    @FXML
+    public TextField edtEnderecoDeEmailCadastro;
+    @FXML
+    public TextField edtDescricaoCadastro;
+    @FXML
+    public Button btnSalvarCadastro;
+
+
+    // Visualização do contato
     @FXML
     public TableView tblDadosPrincipais;
     @FXML
-    public TableColumn colunaNome;
+    public TableColumn colunaNomeSelecionar;
     @FXML
-    public TableColumn colunaEmail;
+    public TableColumn colunaEmailSelecionar;
     @FXML
-    public AnchorPane achDadosCompletos;
+    public TextField edtNomeCompletoSelecionar;
+    @FXML
+    public TextField edtDataDeNascimentoSelecionar;
+    @FXML
+    public TextField edtNumeroDeTelefoneSelecionar;
+    @FXML
+    public TextField edtEnderecoDeEmailSelecionar;
+    @FXML
+    public TextField edtDescricaoSelecionar;
+    @FXML
+    public Button btnRecarregarSelecionar;
+
+
+    // Atualização do contato
+    @FXML
+    public TableView tblAtualizar;
+    @FXML
+    public TableColumn colunaAtualizarNome;
+    @FXML
+    public TextField edtNomeCompletoAtualizar;
+    @FXML
+    public TextField edtDataDeNascimentoAtualizar;
+    @FXML
+    public TextField edtNumeroDeTelefoneAtualizar;
+    @FXML
+    public TextField edtEnderecoDeEmailAtualizar;
+    @FXML
+    public TextField edtDescricaoAtualizar;
+    @FXML
+    public Button btnAtualizar;
+
+
+    // Excluir do contato
+    @FXML
+    public TableView tblExcluir;
+    @FXML
+    public TableColumn colunaExcluirNome;
+    @FXML
+    public TableColumn colunaExcluirNumeroDeTelefone;
+    @FXML
+    public TableColumn colunaExcluirEmail;
+    @FXML
+    public Button btnExcluir;
 
 
     @Override
