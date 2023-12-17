@@ -1,101 +1,266 @@
 package agenda.Core;
 
+import java.sql.Connection;
+
+import agenda.dao.ContatoDAO;
+import agenda.database.Database;
+import agenda.database.DatabaseFactory;
+import agenda.model.Contato;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.TableColumn;
 
 import java.net.URL;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.ResourceBundle;
 
+@SuppressWarnings("ALL")
 public class mainController  implements Initializable {
     @FXML
     public VBox vbFormMain;
 
     //TabsPrincipal
     @FXML
-    public TabPane tabPrincipal;
+    private TabPane tabPrincipal;
     @FXML
-    public Tab tabCadastroContato;
+    private Tab tabCadastroContato;
     @FXML
-    public Tab tabContatoSelecionar;
+    private Tab tabContatoSelecionar;
     @FXML
-    public Tab tabAtualizarContato;
+    private Tab tabAtualizarContato;
     @FXML
-    public Tab tabExcluirContato;
+    private Tab tabExcluirContato;
 
 
     // Cadastrar Contato
     @FXML
-    public TextField edtNomeCompletoCadastro;
+    private TextField edtNomeCompletoCadastro;
     @FXML
-    public TextField edtDataDeNascimentoCadastro;
+    private TextField edtDataDeNascimentoCadastro;
     @FXML
-    public TextField edtNumeroDeTelefoneCadastro;
+    private TextField edtNumeroDeTelefoneCadastro;
     @FXML
-    public TextField edtEnderecoDeEmailCadastro;
+    private TextField edtEnderecoDeEmailCadastro;
     @FXML
-    public TextField edtDescricaoCadastro;
+    private TextField edtDescricaoCadastro;
     @FXML
-    public Button btnSalvarCadastro;
+    private Button btnSalvarCadastro;
 
 
     // Visualização do contato
     @FXML
-    public TableView tblDadosPrincipais;
+    private TableView <Contato> tblSelecionar;
     @FXML
-    public TableColumn colunaNomeSelecionar;
+    private TableColumn <Contato, String> colunaNomeSelecionar;
     @FXML
-    public TableColumn colunaEmailSelecionar;
+    private TableColumn <Contato, String> colunaEmailSelecionar;
     @FXML
-    public TextField edtNomeCompletoSelecionar;
+    private TextField edtNomeCompletoSelecionar;
     @FXML
-    public TextField edtDataDeNascimentoSelecionar;
+    private TextField edtDataDeNascimentoSelecionar;
     @FXML
-    public TextField edtNumeroDeTelefoneSelecionar;
+    private TextField edtNumeroDeTelefoneSelecionar;
     @FXML
-    public TextField edtEnderecoDeEmailSelecionar;
+    private TextField edtEnderecoDeEmailSelecionar;
     @FXML
-    public TextField edtDescricaoSelecionar;
+    private TextField edtDescricaoSelecionar;
     @FXML
-    public Button btnRecarregarSelecionar;
+    private Button btnRecarregarSelecionar;
 
 
     // Atualização do contato
     @FXML
-    public TableView tblAtualizar;
+    private TableView <Contato> tblAtualizar;
     @FXML
-    public TableColumn colunaAtualizarNome;
+    private TableColumn <Contato, String> colunaAtualizarNome;
     @FXML
-    public TextField edtNomeCompletoAtualizar;
+    private TextField edtNomeCompletoAtualizar;
     @FXML
-    public TextField edtDataDeNascimentoAtualizar;
+    private TextField edtDataDeNascimentoAtualizar;
     @FXML
-    public TextField edtNumeroDeTelefoneAtualizar;
+    private TextField edtNumeroDeTelefoneAtualizar;
     @FXML
-    public TextField edtEnderecoDeEmailAtualizar;
+    private TextField edtEnderecoDeEmailAtualizar;
     @FXML
-    public TextField edtDescricaoAtualizar;
+    private TextField edtDescricaoAtualizar;
     @FXML
-    public Button btnAtualizar;
+    private Button btnAtualizar;
 
 
     // Excluir do contato
     @FXML
-    public TableView tblExcluir;
+    private TableView <Contato> tblExcluir;
     @FXML
-    public TableColumn colunaExcluirNome;
+    private TableColumn <Contato, String> colunaExcluirNome;
     @FXML
-    public TableColumn colunaExcluirNumeroDeTelefone;
+    private TableColumn <Contato, String> colunaExcluirNumeroDeTelefone;
     @FXML
-    public TableColumn colunaExcluirEmail;
+    private TableColumn <Contato, String> colunaExcluirEmail;
     @FXML
-    public Button btnExcluir;
+    private Button btnExcluir;
 
+
+    private final Database database = DatabaseFactory.getDatabase("postgresql");
+    private final Connection connection = database != null ? database.conectar() : null;
+    private  final ContatoDAO contatoDAO;
+
+    {
+        try {
+            assert connection != null;
+            contatoDAO = new ContatoDAO(connection);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        carregarTableViewContatos();
+
+        tblSelecionar.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> selecionarItemTblSelecionar(newValue)
+        );
+        tblAtualizar.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> selecionarItemTblAtualizar(newValue)
+        );
+    }
+
+    public void carregarTableViewContatos(){
+        colunaNomeSelecionar.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colunaEmailSelecionar.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colunaAtualizarNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colunaExcluirNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colunaExcluirEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colunaExcluirNumeroDeTelefone.setCellValueFactory(new PropertyValueFactory<>("Numero"));
+
+        List<Contato> listaContatos = contatoDAO.listarContato();
+        ObservableList<Contato> observableListContatos = FXCollections.observableArrayList(listaContatos);
+
+        tblSelecionar.setItems(observableListContatos);
+        tblAtualizar.setItems(observableListContatos);
+        tblExcluir.setItems(observableListContatos);
+    }
+
+    public void selecionarItemTblSelecionar(Contato contato){
+        if (contato != null) {
+            edtNomeCompletoSelecionar.setText(contato.getNome());
+            edtDataDeNascimentoSelecionar.setText(contato.getDataAniversario());
+            edtNumeroDeTelefoneSelecionar.setText(String.valueOf(contato.getNumero()));
+            edtEnderecoDeEmailSelecionar.setText(contato.getEmail());
+            edtDescricaoSelecionar.setText(contato.getDescricao());
+        } else {
+            edtNomeCompletoSelecionar.setText("");
+            edtDataDeNascimentoSelecionar.setText("");
+            edtNumeroDeTelefoneSelecionar.setText("");
+            edtEnderecoDeEmailSelecionar.setText("");
+            edtDescricaoSelecionar.setText("");
+        }
+    }
+
+    public void selecionarItemTblAtualizar(Contato contato){
+        if (contato != null) {
+            edtNomeCompletoAtualizar.setText(contato.getNome());
+            edtDataDeNascimentoAtualizar.setText(contato.getDataAniversario());
+            edtNumeroDeTelefoneAtualizar.setText(String.valueOf(contato.getNumero()));
+            edtEnderecoDeEmailAtualizar.setText(contato.getEmail());
+            edtDescricaoAtualizar.setText(contato.getDescricao());
+
+//            adicionarMascaraTelefone(edtNumeroDeTelefoneAtualizar);
+        } else {
+            edtNomeCompletoAtualizar.setText("");
+            edtDataDeNascimentoAtualizar.setText("");
+            edtNumeroDeTelefoneAtualizar.setText("");
+            edtEnderecoDeEmailAtualizar.setText("");
+            edtDescricaoAtualizar.setText("");
+        }
+    }
+
+    public void atualizarContato(){
+        Contato contatoSelecionado = tblAtualizar.getSelectionModel().getSelectedItem();
+
+        if (contatoSelecionado != null) {
+            contatoSelecionado.setNome(edtNomeCompletoAtualizar.getText());
+            contatoSelecionado.setNumero(Long.valueOf(edtNumeroDeTelefoneAtualizar.getText()));;
+            contatoSelecionado.setDataAniversario((edtDataDeNascimentoAtualizar.getText()));
+            contatoSelecionado.setEmail(edtEnderecoDeEmailAtualizar.getText());
+            contatoSelecionado.setDescricao(edtDescricaoAtualizar.getText());
+
+            if (contatoDAO.alterarContato(contatoSelecionado)) {
+                edtNomeCompletoAtualizar.setText("");
+                edtDataDeNascimentoAtualizar.setText("");
+                edtNumeroDeTelefoneAtualizar.setText("");
+                edtEnderecoDeEmailAtualizar.setText("");
+                edtDescricaoAtualizar.setText("");
+
+                carregarTableViewContatos();
+            }
+        }
+    }
+
+    public void excluirContato(){
+        Contato contatoSelecionado = tblExcluir.getSelectionModel().getSelectedItem();
+
+        if (contatoSelecionado != null) {
+            if (contatoDAO.deletarContato(contatoSelecionado)) {
+                carregarTableViewContatos();
+            }
+        }
 
     }
+
+    public void incluirContato(){
+        if (edtNomeCompletoCadastro.getText() != "" && edtDataDeNascimentoCadastro.getText() != "" && edtNumeroDeTelefoneCadastro.getText() != "" &&
+            edtEnderecoDeEmailCadastro.getText() != "" && edtDescricaoCadastro.getText() != "") {
+
+            Contato contatoNovo = new Contato();
+
+            contatoNovo.setNome(edtNomeCompletoCadastro.getText());
+            contatoNovo.setDataAniversario(edtDataDeNascimentoCadastro.getText());
+            contatoNovo.setNumero(Long.valueOf(edtNumeroDeTelefoneCadastro.getText()));
+            contatoNovo.setEmail(edtEnderecoDeEmailCadastro.getText());
+            contatoNovo.setDescricao(edtDescricaoCadastro.getText());
+
+            if (contatoDAO.inserirContato(contatoNovo)) {
+                edtNomeCompletoCadastro.setText("");
+                edtDataDeNascimentoCadastro.setText("");
+                edtNumeroDeTelefoneCadastro.setText("");
+                edtEnderecoDeEmailCadastro.setText("");
+                edtDescricaoCadastro.setText("");
+
+                carregarTableViewContatos();
+            }
+        }
+    }
+
+//    public static void adicionarMascaraTelefone(TextField textField) {
+//        textField.setOnKeyTyped(event -> {
+//            String textoAtual = textField.getText();
+//            String caractereDigitado = event.getCharacter();
+//
+//            if (caractereDigitado.matches("[0-9]")) {
+//                textoAtual += caractereDigitado;
+//
+//                if (textoAtual.length() == 1) {
+//                    textoAtual = "(" + textoAtual;
+//                } else if (textoAtual.length() == 3) {
+//                    textoAtual += ") ";
+//                } else if (textoAtual.length() == 9) {
+//                    textoAtual += "-";
+//                }
+//
+//                textField.setText(textoAtual);
+//                event.consume();
+//            } else {
+//                event.consume();
+//            }
+//        });
+//    }
 }

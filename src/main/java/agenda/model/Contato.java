@@ -3,8 +3,7 @@ package agenda.model;
 public class Contato {
     private int codContato;
     private String nome;
-    private String sobrenome;
-    private String numero;
+    private Long numero;
     private String dataAniversario;
     private String email;
     private String Descricao;
@@ -12,7 +11,7 @@ public class Contato {
     public Contato(){
     }
 
-    public Contato(String nome, String numero, String email){
+    public Contato(String nome, Long numero, String email){
         this.nome = nome;
         this.numero = numero;
         this.email = email;
@@ -34,19 +33,9 @@ public class Contato {
         this.nome = nome;
     }
 
-    public String getSobrenome() {
-        return sobrenome;
-    }
+    public Long getNumero() { return numero; }
 
-    public void setSobrenome(String sobrenome) {
-        this.sobrenome = sobrenome;
-    }
-
-    public String getNumero() {
-        return numero;
-    }
-
-    public void setNumero(String numero) {
+    public void setNumero(Long numero) {
         this.numero = numero;
     }
 
