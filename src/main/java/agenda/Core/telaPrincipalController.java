@@ -1,45 +1,32 @@
 package agenda.Core;
 
+import java.net.URL;
+import java.util.List;
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ResourceBundle;
+import javafx.scene.image.Image;
+import java.util.Objects;
 
 import agenda.dao.ContatoDAO;
 import agenda.database.Database;
 import agenda.database.DatabaseFactory;
 import agenda.model.Contato;
+import static agenda.Alert.Alerta.mostrarAlertaErro;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.VBox;
 import javafx.scene.control.TableColumn;
+import javafx.stage.Stage;
 
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.ResourceBundle;
-
-@SuppressWarnings("ALL")
-public class mainController  implements Initializable {
-    @FXML
-    public VBox vbFormMain;
-
-    //TabsPrincipal
-    @FXML
-    private TabPane tabPrincipal;
-    @FXML
-    private Tab tabCadastroContato;
-    @FXML
-    private Tab tabContatoSelecionar;
-    @FXML
-    private Tab tabAtualizarContato;
-    @FXML
-    private Tab tabExcluirContato;
-
-
+public class telaPrincipalController implements Initializable {
     // Cadastrar Contato
     @FXML
     private TextField edtNomeCompletoCadastro;
@@ -51,9 +38,6 @@ public class mainController  implements Initializable {
     private TextField edtEnderecoDeEmailCadastro;
     @FXML
     private TextField edtDescricaoCadastro;
-    @FXML
-    private Button btnSalvarCadastro;
-
 
     // Visualização do contato
     @FXML
@@ -72,9 +56,6 @@ public class mainController  implements Initializable {
     private TextField edtEnderecoDeEmailSelecionar;
     @FXML
     private TextField edtDescricaoSelecionar;
-    @FXML
-    private Button btnRecarregarSelecionar;
-
 
     // Atualização do contato
     @FXML
@@ -91,9 +72,6 @@ public class mainController  implements Initializable {
     private TextField edtEnderecoDeEmailAtualizar;
     @FXML
     private TextField edtDescricaoAtualizar;
-    @FXML
-    private Button btnAtualizar;
-
 
     // Excluir do contato
     @FXML
@@ -104,20 +82,21 @@ public class mainController  implements Initializable {
     private TableColumn <Contato, String> colunaExcluirNumeroDeTelefone;
     @FXML
     private TableColumn <Contato, String> colunaExcluirEmail;
-    @FXML
-    private Button btnExcluir;
 
+    // Fazer Logout
+    @FXML
+    private Button btnVoltarTelaLogin;
 
     private final Database database = DatabaseFactory.getDatabase("postgresql");
     private final Connection connection = database != null ? database.conectar() : null;
-    private  final ContatoDAO contatoDAO;
+    private ContatoDAO contatoDAO = null;
 
     {
         try {
             assert connection != null;
             contatoDAO = new ContatoDAO(connection);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            mostrarAlertaErro("Error ", "Ocorreu uma falha durante a execução de uma instrução SQL.", e.toString());
         }
     }
 
@@ -172,8 +151,6 @@ public class mainController  implements Initializable {
             edtNumeroDeTelefoneAtualizar.setText(String.valueOf(contato.getNumero()));
             edtEnderecoDeEmailAtualizar.setText(contato.getEmail());
             edtDescricaoAtualizar.setText(contato.getDescricao());
-
-//            adicionarMascaraTelefone(edtNumeroDeTelefoneAtualizar);
         } else {
             edtNomeCompletoAtualizar.setText("");
             edtDataDeNascimentoAtualizar.setText("");
@@ -213,12 +190,11 @@ public class mainController  implements Initializable {
                 carregarTableViewContatos();
             }
         }
-
     }
 
     public void incluirContato(){
-        if (edtNomeCompletoCadastro.getText() != "" && edtDataDeNascimentoCadastro.getText() != "" && edtNumeroDeTelefoneCadastro.getText() != "" &&
-            edtEnderecoDeEmailCadastro.getText() != "" && edtDescricaoCadastro.getText() != "") {
+        if (!edtNomeCompletoCadastro.getText().isEmpty() && !edtDataDeNascimentoCadastro.getText().isEmpty() && !edtNumeroDeTelefoneCadastro.getText().isEmpty() &&
+            !edtEnderecoDeEmailCadastro.getText().isEmpty() && !edtDescricaoCadastro.getText().isEmpty()) {
 
             Contato contatoNovo = new Contato();
 
@@ -238,6 +214,22 @@ public class mainController  implements Initializable {
                 carregarTableViewContatos();
             }
         }
+    }
+
+    public void fazerLogout() throws IOException {
+        Stage stagePrincipal = (Stage) btnVoltarTelaLogin.getScene().getWindow();
+        stagePrincipal.close();
+
+        Stage stageLogin = new Stage();
+        FXMLLoader fxmlLoaderLogin = new FXMLLoader(getClass().getResource("login.fxml"));
+        Scene scene = new Scene(fxmlLoaderLogin.load());
+        Image imageIcone = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/contact.png")));
+
+        stageLogin.setResizable(false);
+        stageLogin.getIcons().add(imageIcone);
+        stageLogin.setTitle("Agenda de Contatos FX");
+        stageLogin.setScene(scene);
+        stageLogin.show();
     }
 
 //    public static void adicionarMascaraTelefone(TextField textField) {

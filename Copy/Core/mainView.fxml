@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbFormMain" alignment="CENTER" prefHeight="470.0" prefWidth="774.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="agenda.Core.mainController">
+<VBox fx:id="vbFormMain" alignment="CENTER" prefHeight="470.0" prefWidth="774.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="agenda.Core.telaPrincipalController">
     <TabPane fx:id="tabPrincipal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0" prefWidth="774.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab fx:id="tabCadastroContato" text="Cadastrar Contato">
             <AnchorPane fx:id="achCadastro" prefHeight="343.0" prefWidth="562.0">

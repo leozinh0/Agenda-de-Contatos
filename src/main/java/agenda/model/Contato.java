@@ -8,14 +8,6 @@ public class Contato {
     private String email;
     private String Descricao;
 
-    public Contato(){
-    }
-
-    public Contato(String nome, Long numero, String email){
-        this.nome = nome;
-        this.numero = numero;
-        this.email = email;
-    }
 
     public int getCodContato() {
         return codContato;
@@ -61,10 +53,5 @@ public class Contato {
 
     public void setDescricao(String descricao) {
         Descricao = descricao;
-    }
-
-    @Override
-    public String toString() {
-        return this.nome;
     }
 }

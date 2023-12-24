@@ -1,6 +1,7 @@
 package agenda.dao;
 
 import agenda.model.Contato;
+import static agenda.Alert.Alerta.mostrarAlertaErro;
 
 import java.sql.*;
 import java.text.ParseException;
@@ -20,9 +21,6 @@ public class ContatoDAO {
             criarTabelaContato();
         }
     }
-    public Connection getConnection() {
-        return connection;
-    }
 
     public boolean inserirContato(Contato contato) {
         String instrucaoSQL = "INSERT INTO Contato(Nome,            " +
@@ -35,6 +33,7 @@ public class ContatoDAO {
                               "                    ?,               " +
                               "                    ?,               " +
                               "                    ?)               ";
+
         try {
             PreparedStatement statement = connection.prepareStatement(instrucaoSQL);
             statement.setString(1, contato.getNome());
@@ -47,6 +46,7 @@ public class ContatoDAO {
             return true;
         } catch (SQLException e) {
             Logger.getLogger(ContatoDAO.class.getName()).log(Level.SEVERE, null, e);
+            mostrarAlertaErro("Error ", "Ocorreu uma falha durante a execução da instrução de inserção no banco de dados.", e.toString());
             return false;
         }
     }
@@ -58,6 +58,7 @@ public class ContatoDAO {
                               "                   Email = ?,           " +
                               "                   Descricao = ?        " +
                               "             WHERE CodContato = ?       ";
+
         try {
             PreparedStatement statement = connection.prepareStatement(instrucaoSQL);
             statement.setString(1, contato.getNome());
@@ -71,6 +72,7 @@ public class ContatoDAO {
             return true;
         } catch (SQLException e) {
             Logger.getLogger(ContatoDAO.class.getName()).log(Level.SEVERE, null, e);
+            mostrarAlertaErro("Error ", "Ocorreu uma falha durante a execução da instrução de atualização no banco de dados.", e.toString());
             return false;
         }
     }
@@ -87,6 +89,7 @@ public class ContatoDAO {
             return true;
         } catch (SQLException e) {
             Logger.getLogger(ContatoDAO.class.getName()).log(Level.SEVERE, null, e);
+            mostrarAlertaErro("Error ", "Ocorreu uma falha durante a execução da instrução de exclusão no banco de dados.", e.toString());
             return false;
         }
     }
@@ -111,8 +114,9 @@ public class ContatoDAO {
 
                 ListaContatos.add(contato);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(ContatoDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException e) {
+            Logger.getLogger(ContatoDAO.class.getName()).log(Level.SEVERE, null, e);
+            mostrarAlertaErro("Error ", "Ocorreu uma falha ao executar a instrução de seleção no banco de dados.", e.toString());
         }
         return ListaContatos;
     }
@@ -123,8 +127,9 @@ public class ContatoDAO {
             ResultSet tables = metaData.getTables(null, connection.getSchema(), "contato", null);
             return tables.next();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            mostrarAlertaErro("Error ", "Houve uma falha ao verificar a existência da tabela 'Contato' no banco de dados.", e.toString());
         }
+        return false;
     }
     private void criarTabelaContato() {
         try {
@@ -137,9 +142,10 @@ public class ContatoDAO {
                                   "    Descricao VARCHAR(1000) NOT NULL);  								   " +
                                   "                                        								   " +
                                   "ALTER TABLE Contato ADD CONSTRAINT PK_Contato PRIMARY KEY (CodContato); ";
+
             connection.createStatement().executeUpdate(instrucaoSQL);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            mostrarAlertaErro("Error ", "Ocorreu uma falha durante a tentativa de criar a tabela 'Contato' no banco de dados.", e.toString());
         }
     }
 
@@ -149,7 +155,8 @@ public class ContatoDAO {
             java.util.Date utilDate = formato.parse(stringData);
             return new Date(utilDate.getTime());
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            mostrarAlertaErro("Error ", "Houve um problema ao converter uma cadeia de caracteres para o formato de data para o banco de dados", e.toString());
         }
+        return null;
     }
 }
