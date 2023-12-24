@@ -48,17 +48,20 @@ public class loginController implements Initializable {
     }
 
     public void carregarUsuario(){
-        if (edtUsuario.getText().isEmpty()){
-            mostrarAlertaAtencao("Atenção ", "Usuário não especificado.", "");
-            return;
+        if (edtUsuario.getText().isEmpty()) {
+            if (!"Admin".equals(edtUsuario.getPromptText())) {
+                mostrarAlertaAtencao("Atenção ", "Usuário não especificado.", "");
+                return;
+            }
         } else if (edtSenha.getText().isEmpty()) {
             mostrarAlertaAtencao("Atenção ", "Senha não especificada.", "");
             return;
         }
 
-        Boolean UsuarioValido = loginDAO.UsuarioValido(edtUsuario.getText(), edtSenha.getText());
+        String usuario = (edtUsuario.getPromptText().equals("Admin")) ? edtUsuario.getPromptText() : edtUsuario.getText();
+        Boolean usuarioValido = loginDAO.UsuarioValido(usuario, edtSenha.getText());
 
-        if (UsuarioValido) {
+        if (usuarioValido) {
             Stage stageLogin = (Stage) btnLogin.getScene().getWindow();
             stageLogin.close();
 

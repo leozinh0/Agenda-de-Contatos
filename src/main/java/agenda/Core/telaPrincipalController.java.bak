@@ -13,6 +13,7 @@ import agenda.dao.ContatoDAO;
 import agenda.database.Database;
 import agenda.database.DatabaseFactory;
 import agenda.model.Contato;
+
 import static agenda.Alert.Alerta.mostrarAlertaConfirmacao;
 import static agenda.Alert.Alerta.mostrarAlertaErro;
 
